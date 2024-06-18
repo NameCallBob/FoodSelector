@@ -2,109 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Member extends Model implements AuthenticatableContract, JWTSubject
+class Member extends Model
 {
-    use Authenticatable;
+    protected $table = 'member';
 
-/**
-     * 與模型關聯的資料表名稱
-     *
-     * @var string
-     */
-    protected $table = 'members';
-
-    /**
-     * 可以被批量賦值的屬性
-     *
-     * @var array
-     */
     protected $fillable = [
-        'name',
-        'account',
-        'password',
-        'email',
-        'phone',
-        'status',
+        'private_id', 'name', 'phone', 'birth', 'safe_ques1', 'safe_ques2', 'safe_ans1', 'safe_ans2',
     ];
 
-    /**
-     * 隱藏的屬性
-     *
-     * @var array
-     */
     protected $hidden = [
-        'password',
+        'safe_ans1', 'safe_ans2',
     ];
-
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
-
-    /**
-     * 建立新的會員
-     *
-     * @param  array  $data
-     * @return \App\Models\Member
-     */
-    public static function createMember(array $data)
-    {
-        return self::create($data);
-    }
-
-    /**
-     * 取得所有會員
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getAllMembers()
-    {
-        return self::all();
-    }
-
-    /**
-     * 依據 ID 取得會員
-     *
-     * @param  int  $id
-     * @return \App\Models\Member
-     */
-    public static function getMemberById($id)
-    {
-        return self::findOrFail($id);
-    }
-
-    /**
-     * 更新會員資訊
-     *
-     * @param  int  $id
-     * @param  array  $data
-     * @return bool
-     */
-    public static function updateMember($id, array $data)
-    {
-        $member = self::findOrFail($id);
-        return $member->update($data);
-    }
-
-    /**
-     * 刪除會員
-     *
-     * @param  int  $id
-     * @return bool|null
-     */
-    public static function deleteMember($id)
-    {
-        $member = self::findOrFail($id);
-        return $member->delete();
-    }
 }

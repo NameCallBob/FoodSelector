@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-
-
         });
         // 會員
         Schema::create('member', function (Blueprint $table) {
@@ -36,8 +34,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('private_id')->references('id')->on('private')->onDelete('cascade');
-
-
         });
         // 商店
         Schema::create('store', function (Blueprint $table) {
@@ -51,6 +47,7 @@ return new class extends Migration
 
             $table->foreign('private_id')->references('id')->on('private')->onDelete('cascade');
         });
+
         Schema::create('store_info', function (Blueprint $table) {
             $table->id() ->unique();;
             $table->unsignedBigInteger('store_id') -> unique(); // 外鍵
@@ -83,17 +80,7 @@ return new class extends Migration
             $table->foreign('store_id')->references('id')->on('store')->onDelete('cascade');
             $table->foreign('product_cate_id')->references('id')->on('product_cate')->onDelete('cascade');
         });
-        // 收藏
-        Schema::create('collect', function (Blueprint $table) {
-            $table->id() ->unique();;
-            $table->unsignedBigInteger('member_id');
-            $table->unsignedBigInteger('products_id'); // 外鍵
-
-
-            $table->foreign('member_id')->references('id')->on('member')->onDelete('cascade');
-            $table->foreign('products_id')->references('id')->on('products')->onDelete('cascade');
-
-        });
+          
         // 評論
         Schema::create('comment', function (Blueprint $table) {
             $table->id()->unique();;

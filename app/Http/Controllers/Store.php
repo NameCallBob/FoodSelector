@@ -1,92 +1,86 @@
-
 <?php
 
 namespace App\Http\Controllers;
 
 use App\Models\Store;
 use Illuminate\Http\Request;
-
+use Illuminate\Routing\Controller;
 class StoreController extends Controller
 {
-    // 取得所有項目
-    public function index()
-    {
-        return response()->json(Store::all());
-    }
-
-    // 新增項目
-    public function store(Request $request)
+    // Create new store
+    public function create(Request $request)
     {
         $this->validate($request, [
-            'private_id' => 'required|exists:private,id|unique:Stores,private_id',
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'intro' => 'required|string',
-            'tag' => 'required|string',
-            'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'private_id' => 'required|unique:stores|exists:private,id',
+            'phone' => 'required|string|max:255',
+            'email' => 'nullable|string|email|max:255',
             'owner_name' => 'required|string|max:255',
         ]);
 
-        $Store = Store::create($request->all());
+        $store = new Store();
+        $store->private_id = $request->input('private_id');
+        $store->phone = $request->input('phone');
+        $store->email = $request->input('email');
+        $store->owner_name = $request->input('owner_name');
+        $store->save();
 
-        return response()->json($Store, 201);
+        return response()->json($store, 201);
     }
-    // 所有店家資料
-    public function allstore()
-    {
 
+    // Read single store by ID
+    public function read($id)
+    {
+        $store = Store::findOrFail($id);
+        return response()->json($store);
     }
-    // 取得單一項目
-    public function show($id)
-    {
-        $Store = Store::select("id","name","address","intro",'tag')->find($id);
 
-        if (is_null($Store)) {
-            return response()->json(['message' => 'Store not found'], 404);
+    // Read stores with conditions
+    public function readByConditions(Request $request)
+    {
+        $query = Store::query();
+
+        if ($request->has('phone')) {
+            $query->where('phone', $request->input('phone'));
         }
 
-        return response()->json($Store);
+        if ($request->has('email')) {
+            $query->where('email', $request->input('email'));
+        }
+
+        if ($request->has('owner_name')) {
+            $query->where('owner_name', $request->input('owner_name'));
+        }
+
+        $result = $query->get();
+        return response()->json($result);
     }
 
-
-
-    // 更新項目
+    // Update store by ID
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'private_id' => 'required|exists:private,id|unique:Stores,private_id,' . $id,
-            'name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'intro' => 'required|string',
-            'tag' => 'required|string',
-            'phone' => 'required|string|max:20',
-            'email' => 'nullable|email|max:255',
+            'private_id' => 'required|exists:private,id|unique:stores,private_id,' . $id,
+            'phone' => 'required|string|max:255',
+            'email' => 'nullable|string|email|max:255',
             'owner_name' => 'required|string|max:255',
         ]);
 
-        $Store = Store::find($id);
+        $store = Store::findOrFail($id);
+        $store->private_id = $request->input('private_id');
+        $store->phone = $request->input('phone');
+        $store->email = $request->input('email');
+        $store->owner_name = $request->input('owner_name');
+        $store->save();
 
-        if (is_null($Store)) {
-            return response()->json(['message' => 'Store not found'], 404);
-        }
-
-        $Store->update($request->all());
-
-        return response()->json($Store);
+        return response()->json($store);
     }
 
-    // 刪除項目
-    public function destroy($id)
+    // Delete store by ID
+    public function delete($id)
     {
-        $Store = Store::find($id);
+        $store = Store::findOrFail($id);
+        $store->delete();
 
-        if (is_null($Store)) {
-            return response()->json(['message' => 'Store not found'], 404);
-        }
-
-        $Store->delete();
-
-        return response()->json(['message' => 'Store deleted successfully']);
+        return response()->json(['message' => 'Deleted successfully']);
     }
 }
