@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class Member extends Model
+class Member extends Model implements AuthenticatableContract, JWTSubject
 {
-    use HasFactory;
+    use Authenticatable;
 
-    /**
+/**
      * 與模型關聯的資料表名稱
      *
      * @var string
@@ -38,6 +40,16 @@ class Member extends Model
     protected $hidden = [
         'password',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 
     /**
      * 建立新的會員

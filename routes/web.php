@@ -17,4 +17,8 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-
+// 登入
+$router->post('login', [
+    'middleware' => 'auth.login',
+    'uses' => 'AuthController@login',
+]);

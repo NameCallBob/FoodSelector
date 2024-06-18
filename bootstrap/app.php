@@ -73,12 +73,15 @@ $app->configure('app');
 */
 
 $app->middleware([
-    App\Http\Middleware\ExampleMiddleware::class
+    App\Http\Middleware\AuthMiddleware::class
 ]);
 
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
+    'auth.login' => App\Http\Middleware\AuthenticateMember::class,
 ]);
+
+$app->register(Illuminate\Database\MigrationServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -116,5 +119,8 @@ $app->router->group([
 $app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
 
 $app->configure('auth');
+
+$app->configure('database');
+
 
 return $app;

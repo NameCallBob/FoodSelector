@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Middleware;
 
-use Illuminate\Http\Request;
-use App\Models\Member;
+use Closure;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class AuthenticateMember
 {
-    public function login(Request $request)
+    public function handle(Request $request, Closure $next)
     {
-        $credentials = $request->only('account', 'password');
+        $credentials = $request->only('email', 'password');
 
         if (! $token = Auth::attempt($credentials)) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -19,3 +19,5 @@ class AuthController extends Controller
         return response()->json(compact('token'));
     }
 }
+
+?>
