@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Collect;
 use App\Models\ProductCate;
+use Exception;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -84,6 +85,7 @@ class CollectController extends Controller
     public function delete(Request $request)
     {
         $payload = $this -> getPayload($request);
+        
         $id = $request -> input("id");
         $collect = Collect::where("member_id",$payload[0])
                             ->where("products_id",$id)
@@ -97,10 +99,14 @@ class CollectController extends Controller
     }
 
     protected function getPayload(Request $request){
+        try{
+            $token = new Token($request->bearerToken());
+            $payload = JWTAuth::decode($token);
 
-        $token = new Token($request->bearerToken());
-        $payload = JWTAuth::decode($token);
+            return [$payload['id'],$payload['account']];
+        }catch(Exception $e){
+            return false;
+        }
 
-        return [$payload['id'],$payload['account']];
     }
 }

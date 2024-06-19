@@ -13,30 +13,27 @@ class Collect extends Model
         'member_id', 'products_id',
     ];
 
-    public function getCollect($id){
-        // 取得今天的日期
-        $today = Carbon::now()->toDateString();
-        
-        $allcounts = $this -> whereIn('products_id', $id)
-                    ->select('products_id', DB::raw('COUNT(*) as count'))
-                    ->groupBy('products_id')
-                    ->get();
+    public static function getCollect($ids)
+        {
+            // 取得今天的日期
+            $today = Carbon::now()->toDateString();
 
-        $daycount = $this -> whereIn('products_id', $id)
-                    ->where("created_at",$today)
-                    ->select('products_id', DB::raw('COUNT(*) as count'))
-                    ->groupBy('products_id')
-                    ->get();
+            // 取得全部和今天的數量
+            $allCounts = self::whereIn('products_id', $ids)
+                        ->select('products_id', DB::raw('COUNT(*) as count'))
+                        ->groupBy('products_id')
+                        ->get();
 
-        $all_all = 0;
-        $all_day = 0;
-        foreach ($allcounts as $count) {
-            $all_all = $all_all + $count->count;
+            $dayCounts = self::whereIn('products_id', $ids)
+                        ->whereDate('created_at', $today)
+                        ->select('products_id', DB::raw('COUNT(*) as count'))
+                        ->groupBy('products_id')
+                        ->get();
+
+            // 計算總計和今天的總計
+            $allTotal = $allCounts->sum('count');
+            $dayTotal = $dayCounts->sum('count');
+
+            return [$dayTotal, $allTotal];
         }
-        foreach ($daycount as $count) {
-            $all_day = $all_day + $count->count;
-        }
-
-        return [$all_day,$all_all];
-    }
 }

@@ -131,31 +131,25 @@ class StoreInfoController extends Controller
             return response() -> json(['err'=>'token invalid'],400);
         }
         try{
-            $private = PrivateModel::find($id);
+            $private = PrivateModel::findOrFail($id[0]);
 
-            if ($private) {
-                // 取得關聯的 store 的 id
-                try{
-                    $storeId = $private->store->id;
-                    $productIds = $private->store->products()->pluck('id')->toArray();
-                }catch(Exception $e){
-                    return response() -> json(['message' => 'NoData'])->setStatusCode(404);
-                }
-                // 使用 $storeId 做你需要的操作
-                $look_data = Look::getLook($storeId);
-                $collect_data = Collect::getCollect($productIds);
-                return response()->json(
-                    [
-                        'day_collect' => $collect_data[0],
-                        'all_collect' => $collect_data[1],
-                        'day_look' => $look_data[0],
-                        'week_look' => $look_data[1],
-                    ]
-                );
-            }
+           // 取得關聯的 store 的 id 和產品的 id
+            $storeId = $private->store->id;
+            $productIds = $private->store->products()->pluck('id')->toArray();
+
+            // 使用 $storeId 做你需要的操作
+            $look_data = Look::getLook($storeId);
+            $collect_data = Collect::getCollect($productIds);
+
+            return response()->json([
+                'day_collect' => $collect_data[0],
+                'all_collect' => $collect_data[1],
+                'day_look' => $look_data[0],
+                'week_look' => $look_data[1],
+            ]);
 
         }catch(Exception $e){
-            return response()->setStatusCode(400,"NoStoreData");
-        }
+            echo $e;
+            return response()->json(['message' => 'NoData'], 404);        }
     }
 }

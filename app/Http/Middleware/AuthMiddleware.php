@@ -10,6 +10,7 @@ use Log;
 use Illuminate\Http\Request;
 // JWT
 use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Token;
 use Tymon\JWTAuth\Exceptions\JWTException;
 //
 use App\Models\PrivateModel;
@@ -28,41 +29,29 @@ class AuthMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        // 檢查使用者是否有權限執行該操作
-        if ($this->hasPermission($request->user(), $this->getRouteName($request))) {
+        if ($this->shouldAuthenticate($request)) {
             return $next($request);
-        } else {
-            // 確認是否是做登入註冊
-            $action = $this->getRouteName($request);
-            if ($action == "user.login") {
-                $AuthController = new AuthController();
-                return $AuthController->login($request);
-            } else if ($action == "member.register") {
-                $MemberController = new MemberController();
-                return $MemberController->create($request);
-            } else if ($action == "store.register") {
-                $StoreController = new StoreController();
-                return $StoreController->create($request);
-            }
+        }
+        // 檢查使用者是否有權限執行該操作
+        if ($this->hasPermission()) {
+            return $next($request);
         }
         // 沒有權限時,返回錯誤訊息或重定向
         return response()->json(['error' => '您沒有權限執行此操作'], 403);
     }
 
-    protected function hasPermission($user, $action)
+    protected function hasPermission()
     {
-        echo $action;
         return true;
     }
     /**
      * 確認JWTtoken是否有效
      * return 使用者id
      */
-    public function verifyToken(Request $request)
+    public static function verifyToken(Request $request)
     {
-        $token = $request->bearerToken();
-
         try {
+            $token = new Token($request->bearerToken());
             $payload = JWTAuth::decode($token);
 
             // 在這裡您可以自行驗證 payload 數據
@@ -78,29 +67,37 @@ class AuthMiddleware
                 return $id;
             } else {
                 // 驗證失敗
-                return response()->json(['error' => 'Invalid token'], 401);
+                return false;
             }
         } catch (JWTException $e) {
+            // echo $e;
             // 令牌解碼失敗
-            return response()->json(['error' => 'Invalid token'], 401);
+            return true;
         }
-    }
-    private function getRouteName(Request $request)
-    {
-        $route = $request->route();
-        if ($route === null) {
-            Log::error('Route is null for the request: ' . $request->fullUrl());
-            return null;
-        }
-
-        return $route->getName();
     }
     /**
-     * 帳號註冊
-     * $request -> 前端需求
+     * 判斷是否需要進行身份驗證
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return bool
      */
-    public function register($request)
+    protected function shouldAuthenticate($request)
     {
+        // 定義不需要驗證的路徑
+        $exceptPaths = [
+            '/login/',
+            '/member/register/',
+            '/store/register/'
+        ];
 
+        // 檢查請求路徑是否在例外清單中
+        foreach ($exceptPaths as $path) {
+            if ($request->is($path)) {
+                return false;
+            }
+        }
+
+        return true;
     }
+
 }

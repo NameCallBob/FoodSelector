@@ -76,7 +76,9 @@ $app->middleware([
     App\Http\Middleware\CorsMiddleware::class,
     App\Http\Middleware\AuthMiddleware::class
 ]);
-
+$app->routeMiddleware([
+    'check.permission' => App\Http\Middleware\AuthMiddleware::class,
+]);
 $app->register(App\Providers\CatchAllOptionsRequestsProvider::class);
 
 // $app->routeMiddleware([

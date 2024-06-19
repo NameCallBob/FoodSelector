@@ -30,12 +30,12 @@ class AuthController extends Controller
 
         return response()->json(compact('token'))->setStatusCode(200);
     }
-    public function checktoken(){
-        $ob = new AuthMiddleware();
-        $res = $ob -> verifyToken();
+    public function checktoken(Request $request){
+        $res = AuthMiddleware::verifyToken($request);
         if ($res){
-            return response();
+            return response() -> json(['message' => 'ok']);
         }
+        return response() -> json(['err' => 'token invalid'],401);
     }
     public function getPayload(Request $request){
         try{

@@ -18,24 +18,25 @@ class Look extends Model
     /**
      * 取得瀏覽次數
      */
-    public function getLook($id){
+    public static function getLook($storeId)
+    {
         // 取得今天的日期
         $today = Carbon::now()->toDateString();
 
         // 取得過去7天的日期範圍
         $past7days = Carbon::now()->subDays(7)->toDateString();
 
-        // 查詢今天和過去7天的瀏覽次數
-        $allviewCounts = $this -> whereBetween('date', [$past7days, $today])
-            ->where("store_id",$id)
-            ->select(DB::raw('SUM(count) as total_count'))
-            ->first();
+        // 查詢今天的瀏覽次數
+        $todayViewCount = self::where("store_id", $storeId)
+                        ->where("date", $today)
+                        ->count();
 
-        $viewCounts = $this -> where("store_id",$id)
-            ->where("date",$today)
-            ->get();
+        // 查詢過去7天的總瀏覽次數
+        $allViewCounts = self::whereBetween('date', [$past7days, $today])
+                        ->where("store_id", $storeId)
+                        ->sum('count');
 
-        return[$viewCounts->count,$allviewCounts];
+        return [$todayViewCount, $allViewCounts];
     }
     /**
      * 瀏覽次數+=1

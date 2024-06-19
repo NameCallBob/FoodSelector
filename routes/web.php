@@ -19,7 +19,7 @@ $router->get('/', function () use ($router) {
 });
 
 // 登入
-$router->post('login', ['uses' => 'AuthController@login', 'as' => 'user.login']);
+$router->post('/login/', ['uses' => 'AuthController@login', 'as' => 'user.login']);
 $router->get("/api/token/verify/","AuthController@tokencheck");
 
 // 會員相關
@@ -38,12 +38,21 @@ $router->get("/store/goods/{store_id}/",'ProductController@store_data');
 // 商品查詢
 $router->get("/search/",'ProductController@readByConditions');
 
-// 收藏
-$router->post("/product/collect/",'CollectController@create');
-// 列出個人收藏
-$router->get("/collect/",'CollectController@read');
-// 刪除個人收藏
-$router->post("/collect/delete/",'CollectController@delete');
+
+$router->group(['middleware' => 'auth'], function () use ($router) {
+    // 收藏
+    $router->group(['middleware' => 'check.permission:product-collect'], function () use ($router) {
+        $router->post("/product/collect/", 'CollectController@create');
+    });
+
+    $router->group(['middleware' => 'check.permission:collect-read'], function () use ($router) {
+        $router->get("/collect/", 'CollectController@read');
+    });
+
+    $router->group(['middleware' => 'check.permission:collect-delete'], function () use ($router) {
+        $router->post("/collect/delete/", 'CollectController@delete');
+    });
+});
 
 
 // 店家相關
