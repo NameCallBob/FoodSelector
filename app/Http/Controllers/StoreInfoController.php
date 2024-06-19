@@ -126,8 +126,10 @@ class StoreInfoController extends Controller
 
     public function getlookAndCollect(Request $request){
         $ob = new AuthController();
-        $id = $ob -> getPayload($request)[0];
-
+        $id = $ob -> getPayload($request);
+        if($id == false){
+            return response() -> json(['err'=>'token invalid'],400);
+        }
         try{
             $private = PrivateModel::find($id);
 

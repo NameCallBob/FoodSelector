@@ -30,10 +30,11 @@ $router->get("/product/cate/",'ProductCateController@all');
 $router->get("/product/collect/",'');
 // 單一商品
 $router->get("/product/info/{id}/",'ProductController@read');
-// 商店商品
-$router->get("/store/{store_id}",'ProductController@store_data');
 // 所有商店
 $router->get("/store/",'StoreInfoController@all');
+// 商店商品
+$router->get("/store/goods/{store_id}/",'ProductController@store_data');
+
 // 商品查詢
 $router->get("/search/",'ProductController@readByConditions');
 

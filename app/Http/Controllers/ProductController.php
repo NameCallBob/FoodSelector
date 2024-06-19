@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Look;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
@@ -47,6 +48,7 @@ class ProductController extends Controller
         $product = Product::where(
             'store_id',$store_id)->get();;
         if ($product){
+            Look::addLook($store_id);
             return response()->json($product);
         }
         return response()->json($product)->setStatusCode(404);

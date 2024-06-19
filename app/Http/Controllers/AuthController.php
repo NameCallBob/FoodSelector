@@ -11,6 +11,9 @@ use Laravel\Lumen\Routing\Controller;
 use Tymon\JWTAuth\Token;
 
 use App\Http\Middleware\AuthMiddleware;
+
+use Illuminate\Http\JsonResponse; // 确保引入 JsonResponse 类
+
 class AuthController extends Controller
 {
     public function login(Request $request)
@@ -31,17 +34,16 @@ class AuthController extends Controller
         $ob = new AuthMiddleware();
         $res = $ob -> verifyToken();
         if ($res){
-            return response() -> setStatusCode(200);
+            return response();
         }
     }
     public function getPayload(Request $request){
         try{
             $token = new Token($request->bearerToken());
             $payload = JWTAuth::decode($token);
-
             return [$payload['id'],$payload['account']];
         }catch(Exception $e){
-            return response()-> setStatusCode(401,"token is Invalid!!!");
+            return false;
         }
     }
 }
