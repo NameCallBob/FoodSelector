@@ -51,6 +51,7 @@ class AuthMiddleware
 
     protected function hasPermission($user, $action)
     {
+        echo $action;
         return true;
     }
     /**

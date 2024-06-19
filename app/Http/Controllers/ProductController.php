@@ -33,16 +33,23 @@ class ProductController extends Controller
     }
 
     // Read single product by ID
-    public function read($product_id)
+    public function read($id)
     {
-        $product = Product::findOrFail($product_id);
-        return response()->json($product);
+        $product = Product::where(
+            'id',$id)->get();;
+        if ($product){
+            return response()->json($product);
+        }
+        return response()->json($product)->setStatusCode(404);;
     }
 
     public function store_data($store_id){
         $product = Product::where(
-            'store_id',$store_id);
-        return response()->json($product);
+            'store_id',$store_id)->get();;
+        if ($product){
+            return response()->json($product);
+        }
+        return response()->json($product)->setStatusCode(404);
     }
 
     // Read products with conditions

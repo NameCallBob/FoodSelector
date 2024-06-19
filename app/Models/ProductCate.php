@@ -11,4 +11,10 @@ class ProductCate extends Model
     protected $fillable = [
         'name',
     ];
+    protected $guarded = [];
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
 }
