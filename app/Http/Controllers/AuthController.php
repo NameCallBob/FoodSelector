@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Member;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Routing\Controller;
+use App\Models\PrivateModel;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Laravel\Lumen\Routing\Controller;
 
 class AuthController extends Controller
 {
@@ -13,10 +14,16 @@ class AuthController extends Controller
     {
         $credentials = $request->only('account', 'password');
 
-        if (! $token = Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        try {
+            if (! $token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'invalid_credentials'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
-        return response()->json(compact('token'));
+        return response()->json(compact('token')
+        ,status:200
+    );
     }
 }

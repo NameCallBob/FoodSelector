@@ -76,10 +76,10 @@ $app->middleware([
     App\Http\Middleware\AuthMiddleware::class
 ]);
 
-$app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
-    'auth.login' => App\Http\Middleware\AuthenticateMember::class,
-]);
+// $app->routeMiddleware([
+//     'auth' => App\Http\Middleware\Authenticate::class,
+//     'auth.login' => App\Http\Middleware\AuthenticateMember::class,
+// ]);
 
 $app->register(Illuminate\Database\MigrationServiceProvider::class);
 

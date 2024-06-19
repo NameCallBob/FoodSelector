@@ -80,7 +80,7 @@ return new class extends Migration
             $table->foreign('store_id')->references('id')->on('store')->onDelete('cascade');
             $table->foreign('product_cate_id')->references('id')->on('product_cate')->onDelete('cascade');
         });
-          
+
         // 評論
         Schema::create('comment', function (Blueprint $table) {
             $table->id()->unique();;
@@ -100,25 +100,6 @@ return new class extends Migration
             $table->integer('count');
             $table->foreign('store_id')->references('id')->on('store')->onDelete('cascade');
         });
-        // 權限
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id();
-            $table->integer("action");
-        });
-        Schema::create('role_user', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('private_id'); // 外鍵
-            $table->unsignedBigInteger('role_id'); // 外鍵
-            $table->timestamps();
-
-            // 設置外鍵約束
-            $table->foreign('private_id')->references('id')->on('private')->onDelete('cascade');
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-
-            // 設置組合唯一鍵
-            $table->unique(['private_id', 'role_id']);
-        });
-
 
     }
 
@@ -135,6 +116,6 @@ return new class extends Migration
         Schema::dropIfExists('collect');
         Schema::dropIfExists('look');
         Schema::dropIfExists('comment');
-        Schema::dropIfExists('role_user');
+
     }
 };

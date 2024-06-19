@@ -18,7 +18,6 @@ $router->get('/', function () use ($router) {
 });
 
 // 登入
-$router->post('login', [
-    'middleware' => 'auth.login',
-    'uses' => 'AuthController@login',
-]);
+$router->post('login', ['uses' => 'AuthController@login', 'as' => 'user.login']);
+// 會員相關
+$router->get("/store/{store_id}",'ProductController@store_data');

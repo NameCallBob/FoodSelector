@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\PrivateModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Routing\Controller;
+use Laravel\Lumen\Routing\Controller;
 
 class PrivateController extends Controller
 {

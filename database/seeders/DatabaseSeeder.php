@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call('UsersTableSeeder');
+         // 可以在這裡調用其他的 Seeder
+        $this->call([
+            UserSeeder::class,
+
+        ]);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Laravel\Lumen\Routing\Controller;
 
 class ProductController extends Controller
 {
@@ -33,9 +33,15 @@ class ProductController extends Controller
     }
 
     // Read single product by ID
-    public function read($id)
+    public function read($product_id)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($product_id);
+        return response()->json($product);
+    }
+
+    public function store_data($store_id){
+        $product = Product::where(
+            'store_id',$store_id);
         return response()->json($product);
     }
 

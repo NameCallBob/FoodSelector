@@ -6,7 +6,7 @@ use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\PrivateModel;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Laravel\Lumen\Routing\Controller;
 
 class RoleController extends Controller
 {

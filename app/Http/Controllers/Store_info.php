@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\StoreInfo;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
+use Laravel\Lumen\Routing\Controller;
 class StoreInfoController extends Controller
 {
     // Create new store info

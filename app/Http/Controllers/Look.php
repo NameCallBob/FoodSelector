@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Look;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Illuminate\Routing\Controller;
+use Laravel\Lumen\Routing\Controller;
 
 class LookController extends Controller
 {
