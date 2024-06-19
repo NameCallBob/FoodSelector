@@ -23,9 +23,9 @@ class ProductCateController extends Controller
     }
 
     // Read single product category by ID
-    public function read($id)
+    public function all()
     {
-        $productCate = ProductCate::findOrFail($id);
+        $productCate = ProductCate::all();
         return response()->json($productCate);
     }
 

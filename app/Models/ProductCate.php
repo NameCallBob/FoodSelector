@@ -11,6 +11,11 @@ class ProductCate extends Model
     protected $fillable = [
         'name',
     ];
+
+    protected $hidden = [
+        'updated_at', 'created_at',
+    ];
+    
     protected $guarded = [];
 
     public function products()

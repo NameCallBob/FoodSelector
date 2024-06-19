@@ -61,11 +61,11 @@ class ProductController extends Controller
             $query->where('product_cate_id', $request->input('product_cate_id'));
         }
 
-        if ($request->has('store_id')) {
+        if ($request->store_id) {
             $query->where('store_id', $request->input('store_id'));
         }
 
-        if ($request->has('name')) {
+        if ($request->name) {
             $query->where('name', 'LIKE', '%' . $request->input('name') . '%');
         }
 

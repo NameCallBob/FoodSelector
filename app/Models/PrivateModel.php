@@ -72,4 +72,9 @@ class PrivateModel extends Model implements AuthenticatableContract, JWTSubject
     {
         return 'remember_token';
     }
+    // db
+    public function store()
+    {
+        return $this->hasOne(Store::class, 'private_id');
+    }
 }

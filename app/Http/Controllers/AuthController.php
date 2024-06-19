@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\PrivateModel;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Laravel\Lumen\Routing\Controller;
+use Tymon\JWTAuth\Token;
 
+use App\Http\Middleware\AuthMiddleware;
 class AuthController extends Controller
 {
     public function login(Request $request)
@@ -22,8 +25,23 @@ class AuthController extends Controller
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
 
-        return response()->json(compact('token')
-        ,status:200
-    );
+        return response()->json(compact('token'))->setStatusCode(200);
+    }
+    public function checktoken(){
+        $ob = new AuthMiddleware();
+        $res = $ob -> verifyToken();
+        if ($res){
+            return response() -> setStatusCode(200);
+        }
+    }
+    public function getPayload(Request $request){
+        try{
+            $token = new Token($request->bearerToken());
+            $payload = JWTAuth::decode($token);
+
+            return [$payload['id'],$payload['account']];
+        }catch(Exception $e){
+            return response()-> setStatusCode(401,"token is Invalid!!!");
+        }
     }
 }
