@@ -77,4 +77,8 @@ class PrivateModel extends Model implements AuthenticatableContract, JWTSubject
     {
         return $this->hasOne(Store::class, 'private_id');
     }
+    public function member()
+    {
+        return $this->hasOne(Member::class, 'private_id');
+    }
 }

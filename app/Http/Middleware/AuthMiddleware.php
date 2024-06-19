@@ -30,14 +30,15 @@ class AuthMiddleware
     public function handle(Request $request, Closure $next)
     {
         if ($this->shouldAuthenticate($request)) {
-            return $next($request);
+            // 檢查使用者是否有權限執行該操作
+            if ($this->hasPermission()) {
+                return $next($request);
+            }
+            // 沒有權限時,返回錯誤訊息或重定向
+            return response()->json(['error' => '您沒有權限執行此操作']);
+
         }
-        // 檢查使用者是否有權限執行該操作
-        if ($this->hasPermission()) {
-            return $next($request);
-        }
-        // 沒有權限時,返回錯誤訊息或重定向
-        return response()->json(['error' => '您沒有權限執行此操作'], 403);
+        return $next($request);
     }
 
     protected function hasPermission()
@@ -54,25 +55,24 @@ class AuthMiddleware
             $token = new Token($request->bearerToken());
             $payload = JWTAuth::decode($token);
 
-            // 在這裡您可以自行驗證 payload 數據
-            $id = $payload['id'];
-            $account = $payload['account'];
+            // Validate payload data
+            $id = isset($payload['id']) ? $payload['id'] : null;
+            $account = isset($payload['account']) ? $payload['account'] : null;
 
-            $privateModel = PrivateModel::where('id', $id)
-                ->where('account', $account)
-                ->first();
-            // 根據您的需求進行後續的驗證和操作
-            if ($privateModel) {
-                // 驗證通過
-                return $id;
-            } else {
-                // 驗證失敗
-                return false;
+            if ($id && $account) {
+                $privateModel = PrivateModel::where('id', $id)
+                    ->where('account', $account)
+                    ->first();
+
+                if ($privateModel) {
+                    return $id;
+                }
             }
+
+            return false;
         } catch (JWTException $e) {
-            // echo $e;
-            // 令牌解碼失敗
-            return true;
+            Log::error('JWT Exception: ' . $e->getMessage());
+            return false;
         }
     }
     /**
@@ -85,9 +85,9 @@ class AuthMiddleware
     {
         // 定義不需要驗證的路徑
         $exceptPaths = [
-            '/login/',
-            '/member/register/',
-            '/store/register/'
+            'login',
+            'member/register/',
+            'store/register/'
         ];
 
         // 檢查請求路徑是否在例外清單中

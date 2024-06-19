@@ -15,4 +15,12 @@ class Member extends Model
     protected $hidden = [
         'safe_ans1', 'safe_ans2',
     ];
+    public function account_private()
+    {
+        return $this->belongsTo(PrivateModel::class);
+    }
+    public function collect()
+    {
+        return $this->hasMany(Collect::class);
+    }
 }

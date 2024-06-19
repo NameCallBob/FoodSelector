@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Collect;
 use App\Models\ProductCate;
+use App\Models\PrivateModel;
 use Exception;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller;
@@ -17,8 +18,9 @@ class CollectController extends Controller
     public function create(Request $request)
     {
         $payload = $this -> getPayload($request);
+        $member_id = PrivateModel::find($payload[0]) -> member -> id;
         $collect = new Collect();
-        $collect->member_id = $payload[0];
+        $collect->member_id = $member_id;
         $collect->products_id = $request->input('products_id');
         $collect->save();
 
@@ -29,23 +31,11 @@ class CollectController extends Controller
     public function read(Request $request)
     {
         $payload = $this -> getPayload($request);
-         // 取得原始搜尋結果
-         $results = ProductCate::all();
-         // 取得對應關係
-         $productCate = $results->pluck('name')->toArray();
-         $collect = Collect::whereIn('id', $productCate)
-         ->where("member_id",$payload[0])
-         ->get()
-         ->keyBy('id');
+        $member_id = PrivateModel::find($payload[0]) -> member -> id;
 
-        // 處理結果，將 id 替換成對應的 name
-        $processedResults = $results->map(function ($item) use ($collect) {
-            $item->name = $collect[$item->name]->name ?? 'unknown';
-            unset($item->name); // 如果不需要 name_id，可以移除
-            return $item;
-        });
+        $collect = Collect::where("member_id",$member_id)
+                ->get();
 
-        return response()->json($processedResults);
     }
 
     // Read collects with conditions
@@ -85,13 +75,16 @@ class CollectController extends Controller
     public function delete(Request $request)
     {
         $payload = $this -> getPayload($request);
-        
-        $id = $request -> input("id");
-        $collect = Collect::where("member_id",$payload[0])
+        $member_id = PrivateModel::find($payload[0]) -> member -> id;
+
+        $id = $request -> input("products_id");
+        $collect = Collect::where("member_id",$member_id)
                             ->where("products_id",$id)
                             ->get();
         if ($collect){
-            $collect->delete();
+            foreach ($collect as $col) {
+                $col->delete(); // 刪除每個用戶
+            }
             return response()->json(['message' => 'Deleted successfully']);
         }
         return response()->json(['message' => 'failed，not found userData'])

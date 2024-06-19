@@ -32,7 +32,7 @@ class AuthController extends Controller
     }
     public function checktoken(Request $request){
         $res = AuthMiddleware::verifyToken($request);
-        if ($res){
+        if ($res != false){
             return response() -> json(['message' => 'ok']);
         }
         return response() -> json(['err' => 'token invalid'],401);
