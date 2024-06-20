@@ -112,23 +112,25 @@ class ProductController extends Controller
     // Update product by ID
     public function update(Request $request)
     {
-        $this->validate($request, [
-            'product_cate_id' => 'required|exists:product_cates,id',
-            'store_id' => 'required|exists:store,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'picUrl' => 'required|string',
-            'status' => 'required|numeric|min:0'
-        ]);
+        $store_id = $this -> getStoreId($request);
+        try{
+            $this->validate($request, [
+                'product_cate_id' => 'required|exists:product_cate,id',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric|min:0',
+                'status' => 'required|numeric|min:0'
+            ]);
+        }catch(Exception $e){
+            return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
+        }
 
         $product = Product::findOrFail($request -> input('$products_id'));
         $product->product_cate_id = $request->input('product_cate_id');
-        $product->store_id = $request->input('store_id');
+        $product->store_id = $store_id;
         $product->name = $request->input('name');
         $product->description = $request->input('description');
         $product->price = $request->input('price');
-        $product->picUrl = $request->input('picUrl');
         $product->status = $request->input('status');
         $product->save();
 
