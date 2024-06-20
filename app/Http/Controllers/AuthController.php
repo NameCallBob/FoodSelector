@@ -37,7 +37,7 @@ class AuthController extends Controller
         }
         return response() -> json(['err' => 'token invalid'],401);
     }
-    public function getPayload(Request $request){
+    public static function getPayload(Request $request){
         try{
             $token = new Token($request->bearerToken());
             $payload = JWTAuth::decode($token);

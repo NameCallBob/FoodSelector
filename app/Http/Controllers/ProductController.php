@@ -6,6 +6,7 @@ use Exception;
 
 use App\Models\Look;
 use App\Models\Product;
+use App\Models\PrivateModel;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AuthController;
 use Laravel\Lumen\Routing\Controller;
@@ -27,7 +28,7 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
         }
-        
+
         $product = new Product();
         $product->product_cate_id = $request->input('product_cate_id');
         $product->store_id = $store_id;
@@ -109,7 +110,7 @@ class ProductController extends Controller
     }
 
     // Update product by ID
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
         $this->validate($request, [
             'product_cate_id' => 'required|exists:product_cates,id',
@@ -121,7 +122,7 @@ class ProductController extends Controller
             'status' => 'required|numeric|min:0'
         ]);
 
-        $product = Product::findOrFail($id);
+        $product = Product::findOrFail($request -> input('$products_id'));
         $product->product_cate_id = $request->input('product_cate_id');
         $product->store_id = $request->input('store_id');
         $product->name = $request->input('name');
@@ -135,8 +136,8 @@ class ProductController extends Controller
     }
 
     // Update product status by ID
-    public function changestatus(Request $request, $id)
-    {   
+    public function changestatus(Request $request)
+    {
         try{
             $this -> validate($request,[
                 'status' => 'required|numeric|min:0|max:1'
@@ -144,13 +145,13 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response() -> json(['err' => 'Wrong format about status,please check is number and between 0 and 1'],400);
         }
-        
+
         try{
-            $product = Product::findOrFail($id);
+            $product = Product::findOrFail($request -> input('products_id'));
         }catch(Exception $e){
             return response() -> json(['err' => 'No Data'],404);
         }
-        if(parseInt($product->status) != parseInt($request->input('status'))){
+        if(($product->status) != ($request->input('status'))){
             $product->status = $request->input('status');
             $product->save();
             return response()->json(['message' => 'OK']);
@@ -160,7 +161,7 @@ class ProductController extends Controller
 
     // Delete product by ID
     public function delete(Request $request)
-    {   
+    {
         $store_id = $this ->getStoreId($request);
         try{
             $id = $request->input("products_id");
@@ -173,13 +174,13 @@ class ProductController extends Controller
             }
             else{
                 return response()->json(['err' => 'No Data'],404);
-            } 
+            }
         }catch(Exception $e){
             return response()->json(['err' => 'No Data'],404);
         }
 
 
-        
+
     }
 
     /**
