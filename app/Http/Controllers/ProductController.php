@@ -113,8 +113,12 @@ class ProductController extends Controller
     public function update(Request $request)
     {
         $store_id = $this -> getStoreId($request);
+        if(!is_numeric($store_id)){
+            return $store_id;
+        }
         try{
             $this->validate($request, [
+                'products_id' => 'required|exists:products,id',
                 'product_cate_id' => 'required|exists:product_cate,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -124,13 +128,13 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
         }
+
         try{
-            echo $request -> input('$products_id');
-            $product = Product::findOrFail($request -> input('$products_id'));
+            $product = Product::findOrFail($request -> input('products_id'));
         }catch(Exception $e){
             return response() -> json(['err' => 'No Data'],404);
         }
-        
+
         $product->product_cate_id = $request->input('product_cate_id');
         $product->store_id = $store_id;
         $product->name = $request->input('name');
@@ -201,6 +205,6 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response() -> json(['err' => 'token invalid'],401);
         }
-        
+
     }
 }
