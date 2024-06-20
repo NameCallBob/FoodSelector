@@ -124,8 +124,12 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
         }
-
-        $product = Product::findOrFail($request -> input('$products_id'));
+        try{
+            $product = Product::findOrFail($request -> input('$products_id'));
+        }catch(Exception $e){
+            return response() -> json(['err' => 'No Data'],404);
+        }
+        
         $product->product_cate_id = $request->input('product_cate_id');
         $product->store_id = $store_id;
         $product->name = $request->input('name');
@@ -189,8 +193,13 @@ class ProductController extends Controller
      * 從Private資料拿取storeID
      */
     protected function getStoreId(Request $request){
-        $payload = AuthController::getPayload($request);
-        $store_id = PrivateModel::find($payload[0]) -> store -> id;
-        return $store_id;
+        try{
+            $payload = AuthController::getPayload($request);
+            $store_id = PrivateModel::find($payload[0]) -> store -> id;
+            return $store_id;
+        }catch(Exception $e){
+            return response() -> json(['err' => 'token invalid'],401);
+        }
+        
     }
 }
