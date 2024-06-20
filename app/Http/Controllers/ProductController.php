@@ -125,6 +125,7 @@ class ProductController extends Controller
             return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
         }
         try{
+            echo $request -> input('$products_id');
             $product = Product::findOrFail($request -> input('$products_id'));
         }catch(Exception $e){
             return response() -> json(['err' => 'No Data'],404);
