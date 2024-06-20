@@ -9,7 +9,7 @@ class Product extends Model
     protected $table = 'products';
 
     protected $fillable = [
-        'product_cate_id', 'store_id', 'name', 'description', 'price', 'picUrl',
+        'product_cate_id', 'store_id', 'name', 'description', 'price', 'picUrl','status',
     ];
     protected $hidden = [
         'updated_at', 'created_at',
@@ -25,5 +25,12 @@ class Product extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public static function getStoreSingleProduct($store_id,$prodcut_id){
+        $ob = Product::where("store_id",$store_id)
+                    ->where("id",$prodcut_id)
+                    ->find();
+        return $ob ;
     }
 }

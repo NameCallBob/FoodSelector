@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+
 use App\Models\Look;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Http\Controllers\AuthController;
 use Laravel\Lumen\Routing\Controller;
 
 class ProductController extends Controller
@@ -12,22 +15,27 @@ class ProductController extends Controller
     // Create new product
     public function create(Request $request)
     {
-        $this->validate($request, [
-            'product_cate_id' => 'required|exists:product_cates,id',
-            'store_id' => 'required|exists:store,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'picUrl' => 'required|string',
-        ]);
-
+        $store_id = $this -> getStoreId($request);
+        try{
+            $this->validate($request, [
+                'product_cate_id' => 'required|exists:product_cates,id',
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'price' => 'required|numeric|min:0',
+                'status' => 'required|numeric|min:0',
+            ]);
+        }catch(Exception $e){
+            return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
+        }
+        
         $product = new Product();
         $product->product_cate_id = $request->input('product_cate_id');
-        $product->store_id = $request->input('store_id');
+        $product->store_id = $store_id;
         $product->name = $request->input('name');
         $product->description = $request->input('description');
         $product->price = $request->input('price');
-        $product->picUrl = $request->input('picUrl');
+        $product->picUrl = "null" ;
+        $product->status = $request->input('status');
         $product->save();
 
         return response()->json($product, 201);
@@ -44,11 +52,28 @@ class ProductController extends Controller
         return response()->json($product)->setStatusCode(404);;
     }
 
+    /**
+     * 給使用者使用，利用前端傳的store_id查詢
+     */
     public function store_data($store_id){
         $product = Product::where(
-            'store_id',$store_id)->get();;
+            'store_id',$store_id)->get();
         if ($product){
             Look::addLook($store_id);
+            return response()->json($product);
+        }
+        return response()->json($product)->setStatusCode(404);
+    }
+
+    /**
+     * 給賣家使用，從token拿取他的編號自動查詢
+     */
+    public function store_allProduct(Request $request){
+        $store_id = $this -> getStoreId($request);
+        $product = Product::where(
+            'store_id',$store_id)->get();
+        if ($product){
+            // Look::addLook($store_id);
             return response()->json($product);
         }
         return response()->json($product)->setStatusCode(404);
@@ -93,6 +118,7 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'picUrl' => 'required|string',
+            'status' => 'required|numeric|min:0'
         ]);
 
         $product = Product::findOrFail($id);
@@ -102,17 +128,66 @@ class ProductController extends Controller
         $product->description = $request->input('description');
         $product->price = $request->input('price');
         $product->picUrl = $request->input('picUrl');
+        $product->status = $request->input('status');
         $product->save();
 
-        return response()->json($product);
+        return response()->json(['message' => 'ok']);
+    }
+
+    // Update product status by ID
+    public function changestatus(Request $request, $id)
+    {   
+        try{
+            $this -> validate($request,[
+                'status' => 'required|numeric|min:0|max:1'
+            ]);
+        }catch(Exception $e){
+            return response() -> json(['err' => 'Wrong format about status,please check is number and between 0 and 1'],400);
+        }
+        
+        try{
+            $product = Product::findOrFail($id);
+        }catch(Exception $e){
+            return response() -> json(['err' => 'No Data'],404);
+        }
+        if(parseInt($product->status) != parseInt($request->input('status'))){
+            $product->status = $request->input('status');
+            $product->save();
+            return response()->json(['message' => 'OK']);
+        }
+        return response() -> json(['err' => 'you send the status,same as db data'],400);
     }
 
     // Delete product by ID
-    public function delete($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->delete();
+    public function delete(Request $request)
+    {   
+        $store_id = $this ->getStoreId($request);
+        try{
+            $id = $request->input("products_id");
+            $product = Product::getStoreSingleProduct($store_id,$id);
+            if ($product){
+                foreach($product as $pro){
+                    $pro->delete();
+                }
+                return response()->json(['message' => 'Deleted successfully']);
+            }
+            else{
+                return response()->json(['err' => 'No Data'],404);
+            } 
+        }catch(Exception $e){
+            return response()->json(['err' => 'No Data'],404);
+        }
 
-        return response()->json(['message' => 'Deleted successfully']);
+
+        
+    }
+
+    /**
+     * 從Private資料拿取storeID
+     */
+    protected function getStoreId(Request $request){
+        $payload = AuthController::getPayload($request);
+        $store_id = PrivateModel::find($payload[0]) -> store -> id;
+        return $store_id;
     }
 }

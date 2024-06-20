@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
+// log
+use Illuminate\Support\Facades\Log;
+
+
 class Look extends Model
 {
     protected $table = 'look';

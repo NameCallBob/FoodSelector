@@ -24,6 +24,7 @@ class Store extends Model
     {
         return $this->belongsTo(PrivateModel::class);
     }
+    
     public function info()
     {
         return $this->hasOne(StoreInfo::class);

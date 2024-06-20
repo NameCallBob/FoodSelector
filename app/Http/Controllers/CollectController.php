@@ -35,7 +35,6 @@ class CollectController extends Controller
 
         $collect = Collect::where("member_id",$member_id)
                 ->get();
-
     }
 
     // Read collects with conditions

@@ -24,7 +24,7 @@ $router->get("/token/verify/","AuthController@tokencheck");
 
 // 會員相關
 
-// 輸出所有產品類別
+// 輸出所有產品類別(買家、賣家)
 $router->get("/product/cate/",'ProductCateController@all');
 // 收藏商品
 
@@ -34,7 +34,8 @@ $router->get("/product/info/{id}/",'ProductController@read');
 $router->get("/store/",'StoreInfoController@all');
 // 商店商品
 $router->get("/store/goods/{store_id}/",'ProductController@store_data');
-
+// 商店查詢
+$router->get("/store/search",'');
 // 商品查詢
 $router->get("/search/",'ProductController@readByConditions');
 
@@ -50,11 +51,18 @@ $router->post("/collect/delete/",'CollectController@delete');
 $router->get("/store/info/",'StoreInfoController@verify_info');
 // 瀏覽、收藏次數
 $router->get("/store/look/",'StoreInfoController@getlookAndCollect');
-
 // 商品收藏排名
+// $router->get('/product/collect_rank/','');
 
 // 商品上下架
-
+$router->post('/product/edit/status/','ProductController@changestatus');
 // 商品資訊修改
-
+$router->post('/product/edit/update/','ProductController@update');
 // 新增商品
+$router->post('/product/edit/add/','ProductController@create');
+// 刪除商品
+$router->post('/product/edit/delete/','ProductController@delete');
+// 商店所有商品
+$router->get("/product/edit/all/",'ProductController@store_allProduct');
+
+
