@@ -19,7 +19,7 @@ class ProductController extends Controller
         $store_id = $this -> getStoreId($request);
         try{
             $this->validate($request, [
-                'product_cate_id' => 'required|exists:product_cates,id',
+                'product_cate_id' => 'required|exists:product_cate,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'price' => 'required|numeric|min:0',
