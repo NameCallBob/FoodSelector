@@ -4,15 +4,11 @@ use App\Http\Controllers\ProductController;
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 // 照片
-Route::get('/photos/{filename}', function ($filename) {
-    $path = storage_path('app/photos/' . $filename);
+use Illuminate\Support\Facades\Storage;
 
-    if (!Storage::exists('photos/' . $filename)) {
-        abort(404, 'File not found');
-    }
+$router->get('/photos/{folder}/{filename}', 'PhotoController@show');
 
-    return response()->file($path);
-});
+
 
 $router->get('/', function () use ($router) {
     return $router->app->version();
@@ -65,4 +61,6 @@ $router->post('/product/edit/delete/','ProductController@delete');
 // 商店所有商品
 $router->get("/product/edit/all/",'ProductController@store_allProduct');
 
-
+// 隨機
+$router->get("/random/product/",'');
+$router->get("/random/store/",'');

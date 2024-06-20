@@ -19,7 +19,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('account', 'password');
-
+        $ob = PrivateModel::where("");
         try {
             if (! $token = auth()->attempt($credentials)) {
                 return response()->json(['error' => 'invalid_credentials'], 401);
