@@ -4,6 +4,10 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Exception;
+
+use Illuminate\Support\Facades\Route;
+
+
 // 紀錄
 use Log;
 //  前端需求
@@ -14,9 +18,11 @@ use Tymon\JWTAuth\Token;
 use Tymon\JWTAuth\Exceptions\JWTException;
 //
 use App\Models\PrivateModel;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MemberController;
-use App\Http\Controllers\StoreController;
+
+// Role permissions
+use App\Models\UserRole;
+use App\Models\Role;
+use App\Models\Permission;
 
 class AuthMiddleware
 {
@@ -27,23 +33,61 @@ class AuthMiddleware
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next,$permission=null)
     {
         if ($this->shouldAuthenticate($request)) {
             // 檢查使用者是否有權限執行該操作
-            if ($this->hasPermission()) {
+            if ($this->hasPermission($request,$permission)) {
                 return $next($request);
             }
             // 沒有權限時,返回錯誤訊息或重定向
-            return response()->json(['error' => '您沒有權限執行此操作']);
+            return response()->json(['error' => '您沒有權限執行此操作'],403);
 
         }
         return $next($request);
     }
 
-    protected function hasPermission()
+    protected function hasPermission(Request $request,$permissionName)
     {
-        return true;
+        // echo $permission;
+        if($permissionName == null){
+            // 無須權限
+            return true;
+        }
+        else if ($permissionName){
+            $privateId = self::verifyToken($request);
+            if ($privateId){
+                $userRole = UserRole::where('private_id', $privateId)->first();
+
+                if (!$userRole) {
+                    return false; // 如果找不到使用者角色，則返回false
+                }
+
+                // 找出角色對應的所有權限ID
+                $role = Role::find($userRole->role_id);
+
+                if (!$role) {
+                    return false; // 如果找不到角色，則返回false
+                }
+
+                $permissions = $role->permissions()->pluck('permission_id')->toArray();
+
+                // 找出權限的ID
+                $permission = Permission::where('action_name', $permissionName)->first();
+
+                if (!$permission) {
+                    return false; // 如果找不到指定的權限，則返回false
+                }
+
+                // 檢查權限是否在角色擁有的權限中
+                return in_array($permission->id, $permissions);
+            }
+            return response() -> json(['err' => 'token is invalid'],401);
+        }
+        return false;
+
+
+
     }
     /**
      * 確認JWTtoken是否有效

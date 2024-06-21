@@ -36,4 +36,28 @@ class Collect extends Model
 
             return [$dayTotal, $allTotal];
         }
+    public static function getCollectRank($products){
+        $productIds = $products->pluck('id');
+
+       // 查詢 collect 資料表並計算每個 product_id 的數量
+       $collectCounts = Collect::select('products_id', DB::raw('count(*) as total'))
+       ->whereIn('products_id', $productIds)
+       ->groupBy('products_id')
+       ->pluck('total', 'products_id');
+
+       $results = $products->map(function ($product) use ($collectCounts) {
+        return [
+            'id' => $product->id,
+            'name' => $product->name,
+            'store_id' => $product->store_id,
+            'price' => $product->price,
+            'description' => $product->description,
+            'collect_count' => $collectCounts->get($product->id, 0),
+        ];
+        })->sortByDesc('collect_count')->values();
+
+
+        // 輸出結果
+        return response()->json($results);
+    }
 }

@@ -7,24 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Role extends Model
 {
     protected $table = 'roles';
+    protected $fillable = ['role_name'];
 
-    protected $fillable = [
-        'action',
-    ];
-}
-
-// RoleUser
-
-class RoleUser extends Model
-{
-    protected $table = 'role_user';
-
-    protected $fillable = [
-        'private_id', 'role_id',
-    ];
-
-    public function role()
+    public function permissions()
     {
-        return $this->belongsTo(Role::class, 'role_id');
+        return $this->belongsToMany(Permission::class, 'role_permissions', 'role_id', 'permission_id');
     }
 }

@@ -26,11 +26,14 @@ class Product extends Model
     {
         return $this->belongsTo(Store::class);
     }
-
+    public function collects()
+    {
+        return $this->hasMany(Collect::class);
+    }
     public static function getStoreSingleProduct($store_id,$prodcut_id){
         $ob = Product::where("store_id",$store_id)
                     ->where("id",$prodcut_id)
-                    ->find();
+                    ->get();
         return $ob ;
     }
 }

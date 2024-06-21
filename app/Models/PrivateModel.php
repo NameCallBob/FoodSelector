@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Support\Facades\Hash;
 
 class PrivateModel extends Model implements AuthenticatableContract, JWTSubject
 {
@@ -17,7 +18,11 @@ class PrivateModel extends Model implements AuthenticatableContract, JWTSubject
     protected $hidden = [
         'password', 'remember_token',
     ];
-
+    public function updatePassword($newPassword)
+{
+    $this->password = Hash::make($newPassword);
+    return $this->save();
+}
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

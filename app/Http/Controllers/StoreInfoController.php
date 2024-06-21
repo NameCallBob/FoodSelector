@@ -70,24 +70,29 @@ class StoreInfoController extends Controller
     }
 
     // Update store info by ID
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
+        $ob = new AuthController();
+        $id = $ob -> getPayload($request)[0];
+        $private = PrivateModel::findOrFail($id);
+
+        // 取得關聯的 store 的 id 和產品的 id
+        $storeId = $private->store;
+        $storeinfoId = $storeId -> info -> id;
+        $storeId = $storeId -> id;
         $this->validate($request, [
-            'store_id' => 'required|exists:store,id|unique:store_infos,store_id,' . $id,
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:255',
             'intro' => 'required|string',
-            'tag' => 'required|string',
-            'picUrl' => 'required|string|max:255',
         ]);
 
-        $storeInfo = StoreInfo::findOrFail($id);
-        $storeInfo->store_id = $request->input('store_id');
+        $storeInfo = StoreInfo::findOrFail($storeinfoId);
+        $storeInfo->store_id = $storeId;
         $storeInfo->name = $request->input('name');
         $storeInfo->address = $request->input('address');
         $storeInfo->intro = $request->input('intro');
         $storeInfo->tag = $request->input('tag');
-        $storeInfo->picUrl = $request->input('picUrl');
+
         $storeInfo->save();
 
         return response()->json($storeInfo);

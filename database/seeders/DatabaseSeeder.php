@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
          // 可以在這裡調用其他的 Seeder
         $this->call([
             // UserSeeder::class,
-            StoreSeeder::class,
+            // StoreSeeder::class,
+            // PermissionsSeeder::class,
         ]);
     }
 }

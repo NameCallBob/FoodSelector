@@ -19,18 +19,17 @@ class ProductController extends Controller
         $store_id = $this -> getStoreId($request);
         try{
             $this->validate($request, [
-                'product_cate_id' => 'required|exists:product_cate,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'price' => 'required|numeric|min:0',
                 'status' => 'required|numeric|min:0',
             ]);
         }catch(Exception $e){
-            return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
+            return response() -> json(['err' => 'Wrong Query,check the params is [name,description,price,status]'], 400);
         }
 
         $product = new Product();
-        $product->product_cate_id = $request->input('product_cate_id');
+        $product->product_cate_id = 23;
         $product->store_id = $store_id;
         $product->name = $request->input('name');
         $product->description = $request->input('description');
@@ -46,7 +45,7 @@ class ProductController extends Controller
     public function read($id)
     {
         $product = Product::where(
-            'id',$id)->get();;
+            'id',$id)->get();
         if ($product){
             return response()->json($product);
         }
@@ -119,11 +118,9 @@ class ProductController extends Controller
         try{
             $this->validate($request, [
                 'products_id' => 'required|exists:products,id',
-                'product_cate_id' => 'required|exists:product_cate,id',
                 'name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'price' => 'required|numeric|min:0',
-                'status' => 'required|numeric|min:0'
             ]);
         }catch(Exception $e){
             return response() -> json(['err' => 'Wrong Query,check the params is [product_cate_id,name,description,price,status]'], 400);
@@ -135,12 +132,12 @@ class ProductController extends Controller
             return response() -> json(['err' => 'No Data'],404);
         }
 
-        $product->product_cate_id = $request->input('product_cate_id');
+        $product->product_cate_id = 23;
         $product->store_id = $store_id;
         $product->name = $request->input('name');
         $product->description = $request->input('description');
         $product->price = $request->input('price');
-        $product->status = $request->input('status');
+        $product->status = 1;
         $product->save();
 
         return response()->json(['message' => 'ok']);
@@ -154,7 +151,7 @@ class ProductController extends Controller
                 'status' => 'required|numeric|min:0|max:1'
             ]);
         }catch(Exception $e){
-            return response() -> json(['err' => 'Wrong format about status,please check is number and between 0 and 1'],400);
+            return response() -> json(['err' => 'Wrong format about status,please check is number and value is  0 or 1'],400);
         }
 
         try{
@@ -189,8 +186,6 @@ class ProductController extends Controller
         }catch(Exception $e){
             return response()->json(['err' => 'No Data'],404);
         }
-
-
 
     }
 
