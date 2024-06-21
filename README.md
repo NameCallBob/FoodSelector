@@ -24,4 +24,66 @@ If you discover a security vulnerability within Lumen, please send an e-mail to 
 ## License
 
 The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# FoodSelector
+
+耐人尋味 FoodSelector_backend
+=========================
+
+  
+
+後端開發人員：
+
+拼拼
+
+  
+
+專案內容：
+
+     發覺GoogleMap的不良之處並發想建立一個美食平台，使用者可以透過App查詢美食，希望相比GoogleMap可以得到更多資訊且容易查詢到想要的商品，開發隨機挑選商店及商品協助解決現代人的選擇困難！
+
+  
+
+功能：
+
+  
+
+基本
+
+  
+
+*   登入
+    
+*   權限判斷
+    
+*   鎖定帳號（登入失敗五次）
+    
+*   忘記密碼給予新亂數密碼（用於帳號解鎖）
+    
+      
+    
+
+賣家端
+
+  
+
+*   賣家基本資料維護（修改）
+    
+*   賣家商品資料維護（新增修改刪除）
+    
+*   賣家商品上下架
+    
+*   內建商品瀏覽次數、收藏次數之查看（日、月、總）
+    
+*   內建商品收藏排名  
+    
+      
+    
+
+買家端
+
+  
+
+*   買家隨機商品給予
+    
+*   買家收藏商品
+    
+*   買家基本商品查詢、條件查詢
